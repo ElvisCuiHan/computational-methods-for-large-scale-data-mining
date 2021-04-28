@@ -14368,13 +14368,14 @@ $$Y_i\sim\mathcal{N}(X_i\beta,V_i)$$<p>where $V_i=Z_i\Sigma Z_i^T+\sigma^2I$, an
     <span class="c"># working arrays</span>
     <span class="c"># whatever intermediate vectors/arrays you may want to pre-allocate</span>
     <span class="n">yty</span>        <span class="o">::</span> <span class="n">T</span>
-    <span class="n">storage_q</span>  <span class="o">::</span> <span class="kt">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
+    <span class="n">storage_q</span>  <span class="o">::</span> <span class="kt">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}</span> 
     <span class="n">xtx</span>        <span class="o">::</span> <span class="kt">Matrix</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
     <span class="n">ztx</span>        <span class="o">::</span> <span class="kt">Matrix</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
     <span class="n">ztz</span>        <span class="o">::</span> <span class="kt">Matrix</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
     <span class="n">zty</span>        <span class="o">::</span> <span class="kt">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
     <span class="n">xty</span>        <span class="o">::</span> <span class="kt">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
     <span class="n">storage_qq</span> <span class="o">::</span> <span class="kt">Matrix</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
+    <span class="n">storage_nq</span> <span class="o">::</span> <span class="kt">Matrix</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
 <span class="k">end</span>
 
 <span class="c"># constructor</span>
@@ -14392,8 +14393,9 @@ $$Y_i\sim\mathcal{N}(X_i\beta,V_i)$$<p>where $V_i=Z_i\Sigma Z_i^T+\sigma^2I$, an
     <span class="n">zty</span>        <span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span>
     <span class="n">xty</span>        <span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span>
     <span class="n">storage_qq</span> <span class="o">=</span> <span class="n">similar</span><span class="p">(</span><span class="n">ztz</span><span class="p">)</span>
+    <span class="n">storage_nq</span> <span class="o">=</span> <span class="n">similar</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
 
-    <span class="n">LmmObs</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">yty</span><span class="p">,</span> <span class="n">storage_q</span><span class="p">,</span> <span class="n">xtx</span><span class="p">,</span> <span class="n">ztx</span><span class="p">,</span> <span class="n">ztz</span><span class="p">,</span> <span class="n">zty</span><span class="p">,</span> <span class="n">xty</span><span class="p">,</span> <span class="n">storage_qq</span><span class="p">)</span>
+    <span class="n">LmmObs</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">yty</span><span class="p">,</span> <span class="n">storage_q</span><span class="p">,</span> <span class="n">xtx</span><span class="p">,</span> <span class="n">ztx</span><span class="p">,</span> <span class="n">ztz</span><span class="p">,</span> <span class="n">zty</span><span class="p">,</span> <span class="n">xty</span><span class="p">,</span> <span class="n">storage_qq</span><span class="p">,</span> <span class="n">storage_nq</span><span class="p">)</span>
 <span class="k">end</span>
 </pre></div>
 
@@ -14449,13 +14451,12 @@ $$Y_i\sim\mathcal{N}(X_i\beta,V_i)$$<p>where $V_i=Z_i\Sigma Z_i^T+\sigma^2I$, an
     <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="c"># TODO: compute and return the log-likelihood</span>
     
-    <span class="n">L</span> <span class="o">=</span> <span class="kt">LowerTriangular</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+    <span class="n">L</span> <span class="o">.=</span> <span class="kt">LowerTriangular</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+
     <span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span> <span class="o">.=</span> <span class="n">obs</span><span class="o">.</span><span class="n">ztz</span>
-    
-    <span class="c">#obs.storage_qq .= cholesky!(Symmetric(syrk!(&#39;U&#39;, &#39;T&#39;, 1.0, Matrix(inv(LowerTriangular(L)), 1/σ², obs.storage_qq))).L</span>
     <span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span> <span class="o">.=</span> <span class="p">(</span><span class="n">cholesky!</span><span class="p">(</span><span class="kt">Symmetric</span><span class="p">(</span><span class="n">rdiv!</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span><span class="p">,</span> <span class="n">σ²</span><span class="p">)</span> <span class="o">+</span> 
                       <span class="n">inv</span><span class="p">(</span><span class="n">cholesky!</span><span class="p">(</span><span class="kt">Symmetric</span><span class="p">(</span><span class="n">L</span> <span class="o">*</span> <span class="n">transpose</span><span class="p">(</span><span class="n">L</span><span class="p">)))))))</span><span class="o">.</span><span class="n">L</span>
-     
+
     <span class="n">obs</span><span class="o">.</span><span class="n">storage_q</span> <span class="o">.=</span> <span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span> <span class="o">\</span> <span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">zty</span> <span class="o">.-</span> <span class="n">obs</span><span class="o">.</span><span class="n">ztx</span> <span class="o">*</span> <span class="n">β</span><span class="p">)</span>
     
     <span class="n">n</span> <span class="o">=</span> <span class="o">-</span> <span class="p">(</span><span class="n">n</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="nb">π</span><span class="o">*</span><span class="n">σ²</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">logdet</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span><span class="p">))</span> <span class="o">-</span> <span class="n">logdet</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="o">-</span>
@@ -14511,8 +14512,9 @@ $$Y_i\sim\mathcal{N}(X_i\beta,V_i)$$<p>where $V_i=Z_i\Sigma Z_i^T+\sigma^2I$, an
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h3 id="The-formula-I-used-is">The formula I used is<a class="anchor-link" href="#The-formula-I-used-is">&#182;</a></h3>\begin{align}
 \log\text{likelihood}=-\frac{n}{2}\log\left(2\pi\right)-\frac{n\sigma^2}{2}-\frac{1}{2}\log|I_{q}+\frac{L^TZ^TZL}{\sigma^2}| -
-\frac{1}{2\sigma^2}\lVert y-X\beta \lVert_2^2+\frac{1}{\sigma^4}\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^2_2
-\end{align}<h3 id="Proof">Proof<a class="anchor-link" href="#Proof">&#182;</a></h3><p>From <strong>Q1</strong>, we have $V_i=\sigma^2I_{n_i}+Z_i\Sigma Z_i^T$ and
+\frac{1}{2\sigma^2}\lVert y-X\beta \lVert_2^2+\frac{1}{2\sigma^4}\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^2_2
+\end{align}<p>where $\Sigma=LL^T$ and $\left((LL^T)^{-1}+\frac{1}{\sigma^2}Z_i^TZ_i\right)=MM^T$.</p>
+<h3 id="Proof">Proof<a class="anchor-link" href="#Proof">&#182;</a></h3><p>From <strong>Q1</strong>, we have $V_i=\sigma^2I_{n_i}+Z_i\Sigma Z_i^T$ and
 $$\log L(\boldsymbol{\beta},\boldsymbol{\Sigma},\sigma^2|\mathbf{y}_i,\mathbf{X}_i,\mathbf{Z}_i)
 =-\frac{n_i}{2}\log\left(2\pi\right)-\frac{1}{2}\log|V_i|-\frac{1}{2}(y_i-X_i\beta)^TV_i^{-1}(y_i-X_i\beta)
 $$
@@ -14530,7 +14532,7 @@ storage\_qq&amp;=M
 $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^2_2$$<p>In conclusion,</p>
 \begin{align}
 \log\text{likelihood}=-\frac{n}{2}\log\left(2\pi\right)-\frac{n\sigma^2}{2}-\frac{1}{2}\log|I_{q}+\frac{L^TZ^TZL}{\sigma^2}| -
-\frac{1}{2\sigma^2}\lVert y-X\beta \lVert_2^2+\frac{1}{\sigma^4}\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^2_2
+\frac{1}{2\sigma^2}\lVert y-X\beta \lVert_2^2+\frac{1}{2\sigma^4}\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^2_2
 \end{align}
 </div>
 </div>
@@ -14583,7 +14585,7 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>LmmObs{Float64}([5.982282543893973, 2.1686591674794546, -0.6006179768471266, -2.5921722427552263, -4.1950904215114395, 0.1964435991294155, -1.8584206360155053, -0.471394614388984, 3.81327436179623, 2.7050298050380905  …  -0.9698126660920988, -0.056282731487944146, 0.1361331008072202, -0.27281934708288147, 3.204079310642381, 3.1301513446894234, -0.7337423498389697, -1.1992972996496185, 1.552593065317924, 0.9964276305957047], [1.0 -2.506566300781151 … -0.18291088048140966 0.4598620195142903; 1.0 -0.974090320735282 … -0.7383659530381397 0.4874285643091131; … ; 1.0 0.3528183431516365 … 1.9292747611484156 1.2067313494938754; 1.0 0.019416493632924994 … -1.3213407131023014 -0.06848691909471624], [1.0 0.8585392934004743 -1.9174716700008398; 1.0 0.9654277213047047 0.40862623314285934; … ; 1.0 -0.2387107330196111 -2.0711110232845926; 1.0 -0.9537172982914403 -1.1799476703506613], 7920.592515967593, [3.02034594e-314, 2.3882264e-314, 2.416072177e-314], [2000.0 7.318286021569552 … -27.560057241455453 19.275454095874046; 7.318286021569552 2010.5787065188483 … -5.879336208071423 32.62437412025167; … ; -27.560057241455453 -5.879336208071423 … 1982.3343610649047 46.732854634090444; 19.275454095874046 32.62437412025167 … 46.732854634090444 1901.6323257901536], [2000.0 7.318286021569552 … -27.560057241455453 19.275454095874046; -5.306938396090047 -42.928120499846315 … -28.34862491789307 6.57627531843594; -4.4083760092192055 -19.119818852719607 … -19.657259367593987 50.567559508219375], [2000.0 -5.306938396090015 -4.4083760092192055; -5.306938396090015 2047.0348365544394 29.310444065639196; -4.4083760092192055 29.310444065639196 2046.2572130622636], [1501.2716973619506, -30.875172466163555, -1614.2450569926816], [1501.2716973619504, -2008.2435847529005, 284.16176166173324, 844.452000000871, 262.3245955558077], [3.0219001597e-314 3.0219003574e-314 2.410633392e-314; 2.410633202e-314 3.021900397e-314 3.021900476e-314; 3.021900318e-314 3.0219004364e-314 3.0219002783e-314])</pre>
+<pre>LmmObs{Float64}([5.982282543893973, 2.1686591674794546, -0.6006179768471266, -2.5921722427552263, -4.1950904215114395, 0.1964435991294155, -1.8584206360155053, -0.471394614388984, 3.81327436179623, 2.7050298050380905  …  -0.9698126660920988, -0.056282731487944146, 0.1361331008072202, -0.27281934708288147, 3.204079310642381, 3.1301513446894234, -0.7337423498389697, -1.1992972996496185, 1.552593065317924, 0.9964276305957047], [1.0 -2.506566300781151 … -0.18291088048140966 0.4598620195142903; 1.0 -0.974090320735282 … -0.7383659530381397 0.4874285643091131; … ; 1.0 0.3528183431516365 … 1.9292747611484156 1.2067313494938754; 1.0 0.019416493632924994 … -1.3213407131023014 -0.06848691909471624], [1.0 0.8585392934004743 -1.9174716700008398; 1.0 0.9654277213047047 0.40862623314285934; … ; 1.0 -0.2387107330196111 -2.0711110232845926; 1.0 -0.9537172982914403 -1.1799476703506613], 7920.592515967593, [2.33775112e-314, 2.4155841984e-314, 2.4155810284e-314], [2000.0 7.318286021569552 … -27.560057241455453 19.275454095874046; 7.318286021569552 2010.5787065188483 … -5.879336208071423 32.62437412025167; … ; -27.560057241455453 -5.879336208071423 … 1982.3343610649047 46.732854634090444; 19.275454095874046 32.62437412025167 … 46.732854634090444 1901.6323257901536], [2000.0 7.318286021569552 … -27.560057241455453 19.275454095874046; -5.306938396090047 -42.928120499846315 … -28.34862491789307 6.57627531843594; -4.4083760092192055 -19.119818852719607 … -19.657259367593987 50.567559508219375], [2000.0 -5.306938396090015 -4.4083760092192055; -5.306938396090015 2047.0348365544394 29.310444065639196; -4.4083760092192055 29.310444065639196 2046.2572130622636], [1501.2716973619506, -30.875172466163555, -1614.2450569926816], [1501.2716973619504, -2008.2435847529005, 284.16176166173324, 844.452000000871, 262.3245955558077], [3.0233344363e-314 3.0233368473e-314 2.408878344e-314; 3.053466267e-314 3.023336887e-314 3.023336966e-314; 3.023336808e-314 3.0233369263e-314 3.023336768e-314], [0.0 0.0 0.0; 0.0 0.0 0.0; … ; 0.0 0.0 0.0; 0.0 0.0 0.0])</pre>
 </div>
 
 </div>
@@ -14743,12 +14745,12 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
   memory estimate:  30.55 MiB
   allocs estimate:  5
   --------------
-  minimum time:     5.161 ms (0.00% GC)
-  median time:      5.236 ms (0.00% GC)
-  mean time:        5.410 ms (3.17% GC)
-  maximum time:     7.511 ms (8.27% GC)
+  minimum time:     5.535 ms (0.00% GC)
+  median time:      5.727 ms (0.00% GC)
+  mean time:        5.892 ms (2.82% GC)
+  maximum time:     8.694 ms (6.16% GC)
   --------------
-  samples:          925
+  samples:          849
   evals/sample:     1</pre>
 </div>
 
@@ -14789,13 +14791,13 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
 <pre>BenchmarkTools.Trial: 
-  memory estimate:  1.45 KiB
-  allocs estimate:  15
+  memory estimate:  1.72 KiB
+  allocs estimate:  17
   --------------
-  minimum time:     1.733 μs (0.00% GC)
-  median time:      1.783 μs (0.00% GC)
-  mean time:        1.834 μs (2.15% GC)
-  maximum time:     201.454 μs (98.38% GC)
+  minimum time:     1.808 μs (0.00% GC)
+  median time:      1.879 μs (0.00% GC)
+  mean time:        1.933 μs (1.92% GC)
+  maximum time:     188.229 μs (98.47% GC)
   --------------
   samples:          10000
   evals/sample:     10</pre>
@@ -14846,7 +14848,7 @@ where $x$ is the speedup of your program against the standard method.</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>8.809159423540628</pre>
+<pre>9.142520753512132</pre>
 </div>
 
 </div>
@@ -14895,7 +14897,7 @@ where $x$ is the speedup of your program against the standard method.</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>28.546875</pre>
+<pre>28.28125</pre>
 </div>
 
 </div>
