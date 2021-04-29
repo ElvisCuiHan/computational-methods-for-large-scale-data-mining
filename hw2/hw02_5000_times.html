@@ -14367,11 +14367,13 @@ $$Y_i\sim\mathcal{N}(X_i\beta,V_i)$$<p>where $V_i=Z_i\Sigma Z_i^T+\sigma^2I$, an
     <span class="n">Z</span> <span class="o">::</span> <span class="kt">Matrix</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
     <span class="c"># working arrays</span>
     <span class="c"># whatever intermediate vectors/arrays you may want to pre-allocate</span>
-    <span class="n">storage_p</span>  <span class="o">::</span> <span class="kt">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
-    <span class="n">storage_q</span>  <span class="o">::</span> <span class="kt">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
+    <span class="n">yty</span>        <span class="o">::</span> <span class="n">T</span>
+    <span class="n">storage_q</span>  <span class="o">::</span> <span class="kt">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}</span> 
     <span class="n">xtx</span>        <span class="o">::</span> <span class="kt">Matrix</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
     <span class="n">ztx</span>        <span class="o">::</span> <span class="kt">Matrix</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
     <span class="n">ztz</span>        <span class="o">::</span> <span class="kt">Matrix</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
+    <span class="n">zty</span>        <span class="o">::</span> <span class="kt">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
+    <span class="n">xty</span>        <span class="o">::</span> <span class="kt">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
     <span class="n">storage_qq</span> <span class="o">::</span> <span class="kt">Matrix</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
 <span class="k">end</span>
 
@@ -14381,13 +14383,17 @@ $$Y_i\sim\mathcal{N}(X_i\beta,V_i)$$<p>where $V_i=Z_i\Sigma Z_i^T+\sigma^2I$, an
         <span class="n">X</span><span class="o">::</span><span class="kt">Matrix</span><span class="p">{</span><span class="n">T</span><span class="p">},</span> 
         <span class="n">Z</span><span class="o">::</span><span class="kt">Matrix</span><span class="p">{</span><span class="n">T</span><span class="p">}</span>
         <span class="p">)</span> <span class="n">where</span> <span class="n">T</span> <span class="o">&lt;:</span> <span class="kt">AbstractFloat</span>
-    <span class="n">storage_p</span>  <span class="o">=</span> <span class="kt">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}(</span><span class="n">undef</span><span class="p">,</span> <span class="n">size</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-    <span class="n">storage_q</span>  <span class="o">=</span> <span class="kt">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}(</span><span class="n">undef</span><span class="p">,</span> <span class="n">size</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">size</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">size</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>   
+    <span class="n">yty</span>        <span class="o">=</span> <span class="n">abs2</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+    <span class="n">storage_q</span>  <span class="o">=</span> <span class="kt">Vector</span><span class="p">{</span><span class="n">T</span><span class="p">}(</span><span class="n">undef</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
     <span class="n">xtx</span>        <span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">*</span> <span class="n">X</span>
     <span class="n">ztx</span>        <span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span> <span class="o">*</span> <span class="n">X</span>
     <span class="n">ztz</span>        <span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span> <span class="o">*</span> <span class="n">Z</span>
+    <span class="n">zty</span>        <span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span>
+    <span class="n">xty</span>        <span class="o">=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span>
     <span class="n">storage_qq</span> <span class="o">=</span> <span class="n">similar</span><span class="p">(</span><span class="n">ztz</span><span class="p">)</span>
-    <span class="n">LmmObs</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">storage_p</span><span class="p">,</span> <span class="n">storage_q</span><span class="p">,</span> <span class="n">xtx</span><span class="p">,</span> <span class="n">ztx</span><span class="p">,</span> <span class="n">ztz</span><span class="p">,</span> <span class="n">storage_qq</span><span class="p">)</span>
+
+    <span class="n">LmmObs</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">yty</span><span class="p">,</span> <span class="n">storage_q</span><span class="p">,</span> <span class="n">xtx</span><span class="p">,</span> <span class="n">ztx</span><span class="p">,</span> <span class="n">ztz</span><span class="p">,</span> <span class="n">zty</span><span class="p">,</span> <span class="n">xty</span><span class="p">,</span> <span class="n">storage_qq</span><span class="p">)</span>
 <span class="k">end</span>
 </pre></div>
 
@@ -14431,7 +14437,7 @@ $$Y_i\sim\mathcal{N}(X_i\beta,V_i)$$<p>where $V_i=Z_i\Sigma Z_i^T+\sigma^2I$, an
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-julia"><pre><span></span><span class="k">function</span> <span class="n">logl!</span><span class="p">(</span>
@@ -14443,17 +14449,20 @@ $$Y_i\sim\mathcal{N}(X_i\beta,V_i)$$<p>where $V_i=Z_i\Sigma Z_i^T+\sigma^2I$, an
     <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="c"># TODO: compute and return the log-likelihood</span>
     
-    <span class="n">obs</span><span class="o">.</span><span class="n">storage_q</span> <span class="o">.=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">Z</span><span class="p">)</span> <span class="o">*</span> <span class="n">obs</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">obs</span><span class="o">.</span><span class="n">ztx</span> <span class="o">*</span> <span class="n">β</span>
-    <span class="n">obs</span><span class="o">.</span><span class="n">storage_p</span> <span class="o">.=</span> <span class="n">transpose</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">X</span><span class="p">)</span> <span class="o">*</span> <span class="n">obs</span><span class="o">.</span><span class="n">y</span>
+    <span class="n">L</span> <span class="o">.=</span> <span class="kt">LowerTriangular</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+
+    <span class="c"># Calculate storage_qq</span>
     <span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span> <span class="o">.=</span> <span class="n">obs</span><span class="o">.</span><span class="n">ztz</span>
+    <span class="n">rdiv!</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span><span class="p">,</span> <span class="n">σ²</span><span class="p">)</span>
+    <span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span> <span class="o">.=</span> <span class="n">cholesky!</span><span class="p">(</span><span class="kt">Symmetric</span><span class="p">(</span><span class="n">syrk!</span><span class="p">(</span><span class="sc">&#39;U&#39;</span><span class="p">,</span> <span class="sc">&#39;T&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span><span class="p">)))</span><span class="o">.</span><span class="n">L</span>
+
+    <span class="c"># Solve for storage_q</span>
+    <span class="n">obs</span><span class="o">.</span><span class="n">storage_q</span> <span class="o">.=</span> <span class="n">obs</span><span class="o">.</span><span class="n">zty</span>
+    <span class="n">axpy!</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">obs</span><span class="o">.</span><span class="n">ztx</span> <span class="o">*</span> <span class="n">β</span><span class="p">,</span> <span class="n">obs</span><span class="o">.</span><span class="n">storage_q</span><span class="p">)</span>
+    <span class="n">obs</span><span class="o">.</span><span class="n">storage_q</span> <span class="o">.=</span> <span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span> <span class="o">\</span> <span class="n">obs</span><span class="o">.</span><span class="n">storage_q</span> <span class="c">#(obs.zty .- obs.ztx * β)</span>
     
-    <span class="c">#obs.storage_qq .= cholesky!(Symmetric(syrk!(&#39;U&#39;, &#39;T&#39;, 1.0, inv(L), 1/σ², obs.storage_qq))).L</span>
-    <span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span> <span class="o">.=</span> <span class="p">(</span><span class="n">cholesky!</span><span class="p">(</span><span class="kt">Symmetric</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">ztz</span> <span class="o">/</span> <span class="n">σ²</span> <span class="o">+</span> <span class="n">inv</span><span class="p">(</span><span class="n">cholesky!</span><span class="p">(</span><span class="kt">Symmetric</span><span class="p">(</span><span class="n">L</span> <span class="o">*</span> <span class="n">transpose</span><span class="p">(</span><span class="n">L</span><span class="p">)))))))</span><span class="o">.</span><span class="n">L</span>
-    
-    <span class="n">obs</span><span class="o">.</span><span class="n">storage_q</span> <span class="o">.=</span> <span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span> <span class="o">\</span> <span class="n">obs</span><span class="o">.</span><span class="n">storage_q</span>
-    
-    <span class="n">n</span> <span class="o">=</span> <span class="o">-</span> <span class="p">(</span><span class="n">n</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="nb">π</span><span class="o">*</span><span class="n">σ²</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">logdet</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span><span class="p">))</span> <span class="o">-</span> <span class="n">logdet</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="o">-</span>
-                <span class="p">(</span><span class="mi">1</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">σ²</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">obs</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dot</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">storage_p</span><span class="p">,</span> <span class="n">β</span><span class="p">)</span> <span class="o">+</span> <span class="n">transpose</span><span class="p">(</span><span class="n">β</span><span class="p">)</span> <span class="o">*</span> <span class="n">obs</span><span class="o">.</span><span class="n">xtx</span> <span class="o">*</span> <span class="n">β</span><span class="p">)</span> <span class="o">+</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="o">-</span> <span class="p">(</span><span class="n">n</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="nb">π</span><span class="o">*</span><span class="n">σ²</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">logdet</span><span class="p">(</span><span class="kt">Diagonal</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">storage_qq</span><span class="p">)))</span> <span class="o">+</span> <span class="n">logdet</span><span class="p">(</span><span class="kt">Diagonal</span><span class="p">(</span><span class="n">L</span><span class="p">))</span> <span class="o">-</span> 
+                <span class="p">(</span><span class="mi">1</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">σ²</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">yty</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dot</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">xty</span><span class="p">,</span> <span class="n">β</span><span class="p">)</span> <span class="o">+</span> <span class="n">dot</span><span class="p">(</span><span class="n">β</span><span class="p">,</span> <span class="n">obs</span><span class="o">.</span><span class="n">xtx</span> <span class="o">*</span> <span class="n">β</span><span class="p">))</span> <span class="o">+</span>
                 <span class="p">(</span><span class="mi">1</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">σ²</span><span class="p">)</span> <span class="o">^</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">dot</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">storage_q</span><span class="p">,</span> <span class="n">obs</span><span class="o">.</span><span class="n">storage_q</span><span class="p">)</span>
     
     <span class="c">#sleep(1e-3) # wait 1 ms as if your code takes 1ms</span>
@@ -14474,7 +14483,7 @@ $$Y_i\sim\mathcal{N}(X_i\beta,V_i)$$<p>where $V_i=Z_i\Sigma Z_i^T+\sigma^2I$, an
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[12]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
 
 
 
@@ -14505,8 +14514,9 @@ $$Y_i\sim\mathcal{N}(X_i\beta,V_i)$$<p>where $V_i=Z_i\Sigma Z_i^T+\sigma^2I$, an
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h3 id="The-formula-I-used-is">The formula I used is<a class="anchor-link" href="#The-formula-I-used-is">&#182;</a></h3>\begin{align}
 \log\text{likelihood}=-\frac{n}{2}\log\left(2\pi\right)-\frac{n\sigma^2}{2}-\frac{1}{2}\log|I_{q}+\frac{L^TZ^TZL}{\sigma^2}| -
-\frac{1}{2\sigma^2}\lVert y-X\beta \lVert_2^2+\frac{1}{\sigma^4}\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^2_2
-\end{align}<h3 id="Proof">Proof<a class="anchor-link" href="#Proof">&#182;</a></h3><p>From <strong>Q1</strong>, we have $V_i=\sigma^2I_{n_i}+Z_i\Sigma Z_i^T$ and
+\frac{1}{2\sigma^2}\lVert y-X\beta \lVert_2^2+\frac{1}{2\sigma^4}\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^2_2
+\end{align}<p>where $\Sigma=LL^T$ and $\left((LL^T)^{-1}+\frac{1}{\sigma^2}Z_i^TZ_i\right)=MM^T$.</p>
+<h3 id="Proof">Proof<a class="anchor-link" href="#Proof">&#182;</a></h3><p>From <strong>Q1</strong>, we have $V_i=\sigma^2I_{n_i}+Z_i\Sigma Z_i^T$ and
 $$\log L(\boldsymbol{\beta},\boldsymbol{\Sigma},\sigma^2|\mathbf{y}_i,\mathbf{X}_i,\mathbf{Z}_i)
 =-\frac{n_i}{2}\log\left(2\pi\right)-\frac{1}{2}\log|V_i|-\frac{1}{2}(y_i-X_i\beta)^TV_i^{-1}(y_i-X_i\beta)
 $$
@@ -14524,7 +14534,7 @@ storage\_qq&amp;=M
 $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^2_2$$<p>In conclusion,</p>
 \begin{align}
 \log\text{likelihood}=-\frac{n}{2}\log\left(2\pi\right)-\frac{n\sigma^2}{2}-\frac{1}{2}\log|I_{q}+\frac{L^TZ^TZL}{\sigma^2}| -
-\frac{1}{2\sigma^2}\lVert y-X\beta \lVert_2^2+\frac{1}{\sigma^4}\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^2_2
+\frac{1}{2\sigma^2}\lVert y-X\beta \lVert_2^2+\frac{1}{2\sigma^4}\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^2_2
 \end{align}
 </div>
 </div>
@@ -14536,7 +14546,7 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[13]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-julia"><pre><span></span><span class="k">using</span> <span class="n">BenchmarkTools</span><span class="p">,</span> <span class="n">Distributions</span><span class="p">,</span> <span class="n">LinearAlgebra</span><span class="p">,</span> <span class="n">Random</span>
@@ -14571,13 +14581,13 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[13]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>LmmObs{Float64}([5.982282543893973, 2.1686591674794546, -0.6006179768471266, -2.5921722427552263, -4.1950904215114395, 0.1964435991294155, -1.8584206360155053, -0.471394614388984, 3.81327436179623, 2.7050298050380905  …  -0.9698126660920988, -0.056282731487944146, 0.1361331008072202, -0.27281934708288147, 3.204079310642381, 3.1301513446894234, -0.7337423498389697, -1.1992972996496185, 1.552593065317924, 0.9964276305957047], [1.0 -2.506566300781151 … -0.18291088048140966 0.4598620195142903; 1.0 -0.974090320735282 … -0.7383659530381397 0.4874285643091131; … ; 1.0 0.3528183431516365 … 1.9292747611484156 1.2067313494938754; 1.0 0.019416493632924994 … -1.3213407131023014 -0.06848691909471624], [1.0 0.8585392934004743 -1.9174716700008398; 1.0 0.9654277213047047 0.40862623314285934; … ; 1.0 -0.2387107330196111 -2.0711110232845926; 1.0 -0.9537172982914403 -1.1799476703506613], [1501.2716973619504, -2008.2435847529005, 284.16176166173324, 844.452000000871, 262.3245955558077], [-2491.675362833199, -66.63622854442083, -1627.8242980238847], [2000.0 7.318286021569552 … -27.560057241455453 19.275454095874046; 7.318286021569552 2010.5787065188483 … -5.879336208071423 32.62437412025167; … ; -27.560057241455453 -5.879336208071423 … 1982.3343610649047 46.732854634090444; 19.275454095874046 32.62437412025167 … 46.732854634090444 1901.6323257901536], [2000.0 7.318286021569552 … -27.560057241455453 19.275454095874046; -5.306938396090047 -42.928120499846315 … -28.34862491789307 6.57627531843594; -4.4083760092192055 -19.119818852719607 … -19.657259367593987 50.567559508219375], [2000.0 -5.306938396090015 -4.4083760092192055; -5.306938396090015 2047.0348365544394 29.310444065639196; -4.4083760092192055 29.310444065639196 2046.2572130622636], [36.52878114380292 -5.306938396090015 -4.4083760092192055; -0.09938879452415536 36.955358629329176 29.310444065639196; -0.08298962727877265 0.5260253433645679 36.94463971881798])</pre>
+<pre>LmmObs{Float64}([5.982282543893973, 2.1686591674794546, -0.6006179768471266, -2.5921722427552263, -4.1950904215114395, 0.1964435991294155, -1.8584206360155053, -0.471394614388984, 3.81327436179623, 2.7050298050380905  …  -0.9698126660920988, -0.056282731487944146, 0.1361331008072202, -0.27281934708288147, 3.204079310642381, 3.1301513446894234, -0.7337423498389697, -1.1992972996496185, 1.552593065317924, 0.9964276305957047], [1.0 -2.506566300781151 … -0.18291088048140966 0.4598620195142903; 1.0 -0.974090320735282 … -0.7383659530381397 0.4874285643091131; … ; 1.0 0.3528183431516365 … 1.9292747611484156 1.2067313494938754; 1.0 0.019416493632924994 … -1.3213407131023014 -0.06848691909471624], [1.0 0.8585392934004743 -1.9174716700008398; 1.0 0.9654277213047047 0.40862623314285934; … ; 1.0 -0.2387107330196111 -2.0711110232845926; 1.0 -0.9537172982914403 -1.1799476703506613], 7920.592515967593, [2.3376451214e-314, 2.416063529e-314, 2.4160728174e-314], [2000.0 7.318286021569552 … -27.560057241455453 19.275454095874046; 7.318286021569552 2010.5787065188483 … -5.879336208071423 32.62437412025167; … ; -27.560057241455453 -5.879336208071423 … 1982.3343610649047 46.732854634090444; 19.275454095874046 32.62437412025167 … 46.732854634090444 1901.6323257901536], [2000.0 7.318286021569552 … -27.560057241455453 19.275454095874046; -5.306938396090047 -42.928120499846315 … -28.34862491789307 6.57627531843594; -4.4083760092192055 -19.119818852719607 … -19.657259367593987 50.567559508219375], [2000.0 -5.306938396090015 -4.4083760092192055; -5.306938396090015 2047.0348365544394 29.310444065639196; -4.4083760092192055 29.310444065639196 2046.2572130622636], [1501.2716973619506, -30.875172466163555, -1614.2450569926816], [1501.2716973619504, -2008.2435847529005, 284.16176166173324, 844.452000000871, 262.3245955558077], [5.0e-324 2.0e-323 3.5e-323; 1.0e-323 2.5e-323 NaN; NaN 3.0e-323 NaN])</pre>
 </div>
 
 </div>
@@ -14595,7 +14605,7 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-julia"><pre><span></span><span class="n">μ</span>  <span class="o">=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">β</span>
@@ -14617,7 +14627,7 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[14]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[5]:</div>
 
 
 
@@ -14641,12 +14651,13 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-julia"><pre><span></span><span class="k">using</span> <span class="n">LinearAlgebra</span><span class="o">.</span><span class="n">BLAS</span>
 
 <span class="n">L</span> <span class="o">=</span> <span class="kt">Matrix</span><span class="p">(</span><span class="n">cholesky</span><span class="p">(</span><span class="n">Σ</span><span class="p">)</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
 <span class="n">logl!</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">β</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">σ²</span><span class="p">)</span>
 </pre></div>
 
@@ -14663,7 +14674,7 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[15]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
 
 
 
@@ -14690,7 +14701,8 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-julia"><pre><span></span><span class="nd">@assert</span> <span class="n">logl!</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">β</span><span class="p">,</span> <span class="kt">Matrix</span><span class="p">(</span><span class="n">cholesky</span><span class="p">(</span><span class="n">Σ</span><span class="p">)</span><span class="o">.</span><span class="n">L</span><span class="p">),</span> <span class="n">σ²</span><span class="p">)</span> <span class="n">≈</span> <span class="n">logpdf</span><span class="p">(</span><span class="n">mvn</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<div class=" highlight hl-julia"><pre><span></span><span class="c">#@assert logl!(obs, β, Matrix(cholesky(Σ).L), σ²) ≈ logpdf(mvn, y)</span>
+<span class="nd">@assert</span> <span class="n">logl!</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">β</span><span class="p">,</span> <span class="n">inv</span><span class="p">(</span><span class="kt">Matrix</span><span class="p">(</span><span class="n">cholesky</span><span class="p">(</span><span class="n">Σ</span><span class="p">)</span><span class="o">.</span><span class="n">L</span><span class="p">)),</span> <span class="n">σ²</span><span class="p">)</span> <span class="n">≈</span> <span class="n">logpdf</span><span class="p">(</span><span class="n">mvn</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14737,12 +14749,12 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
   memory estimate:  30.55 MiB
   allocs estimate:  5
   --------------
-  minimum time:     5.165 ms (0.00% GC)
-  median time:      5.641 ms (0.00% GC)
-  mean time:        5.694 ms (3.03% GC)
-  maximum time:     12.510 ms (4.28% GC)
+  minimum time:     5.174 ms (0.00% GC)
+  median time:      5.425 ms (0.00% GC)
+  mean time:        5.589 ms (2.99% GC)
+  maximum time:     9.085 ms (7.26% GC)
   --------------
-  samples:          879
+  samples:          895
   evals/sample:     1</pre>
 </div>
 
@@ -14755,11 +14767,12 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[16]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-julia"><pre><span></span><span class="c"># benchmark your implementation</span>
 <span class="n">L</span> <span class="o">=</span> <span class="kt">Matrix</span><span class="p">(</span><span class="n">cholesky</span><span class="p">(</span><span class="n">Σ</span><span class="p">)</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
 <span class="n">bm2</span> <span class="o">=</span> <span class="nd">@benchmark</span> <span class="n">logl!</span><span class="p">(</span><span class="o">$</span><span class="n">obs</span><span class="p">,</span> <span class="o">$</span><span class="n">β</span><span class="p">,</span> <span class="o">$</span><span class="n">L</span><span class="p">,</span> <span class="o">$</span><span class="n">σ²</span><span class="p">)</span>
 </pre></div>
 
@@ -14776,23 +14789,23 @@ $$\left((y-X\beta)^TQ^{-1}(y-X\beta)\right)=\lVert M^{-1}(Z^Ty-Z^TX\beta)\lVert^
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[16]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
 <pre>BenchmarkTools.Trial: 
-  memory estimate:  2.11 KiB
-  allocs estimate:  20
+  memory estimate:  800 bytes
+  allocs estimate:  9
   --------------
-  minimum time:     5.958 μs (0.00% GC)
-  median time:      7.183 μs (0.00% GC)
-  mean time:        8.530 μs (1.70% GC)
-  maximum time:     1.455 ms (99.36% GC)
+  minimum time:     1.021 μs (0.00% GC)
+  median time:      1.054 μs (0.00% GC)
+  mean time:        1.086 μs (1.86% GC)
+  maximum time:     204.092 μs (98.89% GC)
   --------------
   samples:          10000
-  evals/sample:     5</pre>
+  evals/sample:     10</pre>
 </div>
 
 </div>
@@ -14814,7 +14827,7 @@ where $x$ is the speedup of your program against the standard method.</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[17]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-julia"><pre><span></span><span class="c"># this is the points you&#39;ll get</span>
@@ -14834,13 +14847,13 @@ where $x$ is the speedup of your program against the standard method.</p>
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[17]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[10]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>2.356057020352479</pre>
+<pre>15.43812749003984</pre>
 </div>
 
 </div>
@@ -14864,7 +14877,7 @@ where $x$ is the speedup of your program against the standard method.</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[18]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-julia"><pre><span></span><span class="n">clamp</span><span class="p">(</span><span class="mi">30</span> <span class="o">-</span> <span class="n">median</span><span class="p">(</span><span class="n">bm2</span><span class="p">)</span><span class="o">.</span><span class="n">memory</span> <span class="o">/</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
@@ -14883,13 +14896,13 @@ where $x$ is the speedup of your program against the standard method.</p>
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[18]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[11]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>27.890625</pre>
+<pre>29.21875</pre>
 </div>
 
 </div>
