@@ -14521,9 +14521,9 @@ $$\frac{\partial \mathbf{r}_i^T\mathbf{\Omega}_i^{-1}\mathbf{r}_i}{\partial\math
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h4 id="Observed-Information-Matrix">Observed Information Matrix<a class="anchor-link" href="#Observed-Information-Matrix">&#182;</a></h4>\begin{align}
 \mathcal{M}(\beta,\sigma^2,\mathbf{L})&amp;=\sum_{i=1}^n\left[\begin{matrix}
-\nabla_{\beta} \ell_i \nabla^T_{\beta} \ell_i &amp; \nabla_{\beta} \ell_i\nabla_{\sigma^2} \ell_i &amp;\nabla_{\beta} \ell_i\nabla^T_{\mathbf{L}} \ell_i\\
-\nabla_{\sigma^2} \ell_i\nabla_{\beta} \ell_i&amp;\nabla_{\sigma^2} \ell_i\nabla_{\sigma^2} \ell_i&amp;\nabla_{\sigma^2} \ell_i\nabla^T_{\mathbf{L}} \ell_i\\
-\nabla_{\mathbf{L}} \ell_i\nabla^T_{\beta} \ell_i&amp;\nabla_{\mathbf{L}} \ell_i\nabla_{\sigma^2} \ell_i&amp;\nabla_{\mathbf{L}} \ell_i\nabla^T_{\mathbf{L}} \ell_i
+\nabla^2_{\beta} \ell_i &amp; \nabla_{\beta}\nabla_{\sigma^2} \ell_i &amp;\nabla_{\beta} \nabla^T_{\mathbf{L}} \ell_i\\
+\nabla_{\sigma^2} \nabla_{\beta} \ell_i&amp;\nabla_{\sigma^2}^2 \ell_i&amp;\nabla_{\sigma^2}\nabla^T_{\mathbf{L}} \ell_i\\
+\nabla_{\mathbf{L}}\nabla^T_{\beta} \ell_i&amp;\nabla_{\mathbf{L}}\nabla_{\sigma^2} \ell_i&amp;\nabla_{\mathbf{L}}^2 \ell_i
 \end{matrix}\right]
 \end{align}<p>where now $\nabla_{\mathbf{L}} \ell_i$ is the <strong>vectorized</strong> version.</p>
 
@@ -14931,13 +14931,13 @@ obs.∇σ² = [5.501620540891281]
   memory estimate:  0 bytes
   allocs estimate:  0
   --------------
-  minimum time:     701.389 ns (0.00% GC)
-  median time:      707.465 ns (0.00% GC)
-  mean time:        714.162 ns (0.00% GC)
-  maximum time:     1.363 μs (0.00% GC)
+  minimum time:     675.864 ns (0.00% GC)
+  median time:      684.253 ns (0.00% GC)
+  mean time:        691.066 ns (0.00% GC)
+  maximum time:     1.107 μs (0.00% GC)
   --------------
   samples:          10000
-  evals/sample:     144</pre>
+  evals/sample:     154</pre>
 </div>
 
 </div>
@@ -14984,10 +14984,10 @@ obs.∇σ² = [5.501620540891281]
   memory estimate:  0 bytes
   allocs estimate:  0
   --------------
-  minimum time:     1.617 μs (0.00% GC)
-  median time:      1.642 μs (0.00% GC)
-  mean time:        1.661 μs (0.00% GC)
-  maximum time:     6.392 μs (0.00% GC)
+  minimum time:     1.583 μs (0.00% GC)
+  median time:      1.613 μs (0.00% GC)
+  mean time:        1.616 μs (0.00% GC)
+  maximum time:     4.108 μs (0.00% GC)
   --------------
   samples:          10000
   evals/sample:     10</pre>
@@ -15413,12 +15413,12 @@ lmm.∇L = [24.419901311348944 24.011922772751674 16.56376848155736; 30.99925900
   memory estimate:  0 bytes
   allocs estimate:  0
   --------------
-  minimum time:     1.686 ms (0.00% GC)
-  median time:      1.811 ms (0.00% GC)
-  mean time:        1.815 ms (0.00% GC)
-  maximum time:     2.039 ms (0.00% GC)
+  minimum time:     1.644 ms (0.00% GC)
+  median time:      1.656 ms (0.00% GC)
+  mean time:        1.684 ms (0.00% GC)
+  maximum time:     1.964 ms (0.00% GC)
   --------------
-  samples:          2751
+  samples:          2964
   evals/sample:     1</pre>
 </div>
 
@@ -15734,34 +15734,14 @@ lmm.L = [1.442089600524507 0.0 0.0; 0.03830200684866265 1.0546394793870688 0.0; 
 <h3 id="Correctness">Correctness<a class="anchor-link" href="#Correctness">&#182;</a></h3><p>Your start points should have a log-likelihood larger than -3.352991e6 (10 pts). The points you get are</p>
 
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-julia"><pre><span></span><span class="c"># this is the points you get</span>
-<span class="p">(</span><span class="n">logl!</span><span class="p">(</span><span class="n">lmm</span><span class="p">)</span> <span class="o">&gt;</span>  <span class="o">-</span><span class="mf">3.352991e6</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Efficiency">Efficiency<a class="anchor-link" href="#Efficiency">&#182;</a></h3><p>The start point should be computed quickly. Otherwise there is no point using it as a starting point. You get full credit (10 pts) if the median run time is within 1ms.</p>
-
-</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[22]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-julia"><pre><span></span><span class="n">bm_init</span> <span class="o">=</span> <span class="nd">@benchmark</span> <span class="n">init_ls!</span><span class="p">(</span><span class="o">$</span><span class="n">lmm</span><span class="p">)</span>
+<div class=" highlight hl-julia"><pre><span></span><span class="c"># this is the points you get</span>
+<span class="p">(</span><span class="n">logl!</span><span class="p">(</span><span class="n">lmm</span><span class="p">)</span> <span class="o">&gt;</span>  <span class="o">-</span><span class="mf">3.353e6</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span>
 </pre></div>
 
      </div>
@@ -15783,16 +15763,59 @@ lmm.L = [1.442089600524507 0.0 0.0; 0.03830200684866265 1.0546394793870688 0.0; 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
+<pre>10</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="Efficiency">Efficiency<a class="anchor-link" href="#Efficiency">&#182;</a></h3><p>The start point should be computed quickly. Otherwise there is no point using it as a starting point. You get full credit (10 pts) if the median run time is within 1ms.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[23]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">bm_init</span> <span class="o">=</span> <span class="nd">@benchmark</span> <span class="n">init_ls!</span><span class="p">(</span><span class="o">$</span><span class="n">lmm</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[23]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
 <pre>BenchmarkTools.Trial: 
   memory estimate:  1.12 MiB
   allocs estimate:  8012
   --------------
-  minimum time:     401.625 μs (0.00% GC)
-  median time:      433.750 μs (0.00% GC)
-  mean time:        576.371 μs (16.58% GC)
-  maximum time:     11.956 ms (96.05% GC)
+  minimum time:     385.208 μs (0.00% GC)
+  median time:      406.709 μs (0.00% GC)
+  mean time:        490.093 μs (12.51% GC)
+  maximum time:     8.117 ms (92.64% GC)
   --------------
-  samples:          8627
+  samples:          10000
   evals/sample:     1</pre>
 </div>
 
@@ -15805,7 +15828,7 @@ lmm.L = [1.442089600524507 0.0 0.0; 0.03830200684866265 1.0546394793870688 0.0; 
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[23]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[24]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-julia"><pre><span></span><span class="c"># this is the points you get</span>
@@ -15825,7 +15848,7 @@ lmm.L = [1.442089600524507 0.0 0.0; 0.03830200684866265 1.0546394793870688 0.0; 
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[23]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[24]:</div>
 
 
 
@@ -15849,7 +15872,7 @@ lmm.L = [1.442089600524507 0.0 0.0; 0.03830200684866265 1.0546394793870688 0.0; 
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[24]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[25]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-julia"><pre><span></span><span class="s">&quot;&quot;&quot;</span>
@@ -16025,7 +16048,7 @@ lmm.L = [1.442089600524507 0.0 0.0; 0.03830200684866265 1.0546394793870688 0.0; 
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[25]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[26]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-julia"><pre><span></span><span class="c"># initialize from least squares</span>
@@ -16069,7 +16092,7 @@ lmm.L = [1.442089600524507 0.0 0.0; 0.03830200684866265 1.0546394793870688 0.0; 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>objective value at starting point: -3.3529912271664594e6
 
-  0.563395 seconds (1.41 M allocations: 77.550 MiB, 2.58% gc time, 84.26% compilation time)
+  0.558595 seconds (1.41 M allocations: 77.550 MiB, 2.44% gc time, 84.63% compilation time)
 objective value at solution: -2.8342645025174716e6
 
 solution values:
@@ -16088,7 +16111,7 @@ sqrt(abs2(norm(lmm.∇β)) + abs2(norm(lmm.∇σ²) + abs2(norm(LowerTriangular(
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[25]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[26]:</div>
 
 
 
@@ -16112,7 +16135,7 @@ sqrt(abs2(norm(lmm.∇β)) + abs2(norm(lmm.∇σ²) + abs2(norm(LowerTriangular(
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p><strong>This part cannot be evaluated in my M1-chip. On my old Mac, the error is 0.06.</strong></p>
+<p><strong>This part cannot be evaluated in my M1-chip. On my old Mac, the error of gradient is 0.06.</strong></p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -16142,7 +16165,7 @@ sqrt(abs2(norm(lmm.∇β)) + abs2(norm(lmm.∇σ²) + abs2(norm(LowerTriangular(
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[26]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[28]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-julia"><pre><span></span><span class="n">bm_bfgs</span> <span class="o">=</span> <span class="nd">@benchmark</span> <span class="n">fit!</span><span class="p">(</span><span class="o">$</span><span class="n">lmm</span><span class="p">,</span> <span class="o">$</span><span class="p">(</span><span class="n">NLopt</span><span class="o">.</span><span class="n">NLoptSolver</span><span class="p">(</span><span class="n">algorithm</span><span class="o">=:</span><span class="n">LD_LBFGS</span><span class="p">,</span> 
@@ -16164,7 +16187,7 @@ sqrt(abs2(norm(lmm.∇β)) + abs2(norm(lmm.∇σ²) + abs2(norm(LowerTriangular(
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[26]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[28]:</div>
 
 
 
@@ -16174,12 +16197,12 @@ sqrt(abs2(norm(lmm.∇β)) + abs2(norm(lmm.∇σ²) + abs2(norm(LowerTriangular(
   memory estimate:  10.17 KiB
   allocs estimate:  209
   --------------
-  minimum time:     87.540 ms (0.00% GC)
-  median time:      88.515 ms (0.00% GC)
-  mean time:        88.617 ms (0.00% GC)
-  maximum time:     90.782 ms (0.00% GC)
+  minimum time:     83.859 ms (0.00% GC)
+  median time:      84.246 ms (0.00% GC)
+  mean time:        84.669 ms (0.00% GC)
+  maximum time:     88.920 ms (0.00% GC)
   --------------
-  samples:          57
+  samples:          59
   evals/sample:     1</pre>
 </div>
 
@@ -16192,7 +16215,7 @@ sqrt(abs2(norm(lmm.∇β)) + abs2(norm(lmm.∇σ²) + abs2(norm(LowerTriangular(
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[27]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[29]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-julia"><pre><span></span><span class="c"># this is the points you get</span>
@@ -16212,7 +16235,7 @@ sqrt(abs2(norm(lmm.∇β)) + abs2(norm(lmm.∇σ²) + abs2(norm(LowerTriangular(
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[27]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[29]:</div>
 
 
 
@@ -16307,6 +16330,12 @@ This program contains Ipopt, a library for large-scale nonlinear optimization.
 
 </div>
 
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p><strong><code>LBFGS</code> and <code>BOBYQA</code> might have some issues in M1 chip.</strong></p>
+
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
