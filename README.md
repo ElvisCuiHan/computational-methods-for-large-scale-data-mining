@@ -1,5 +1,5 @@
 # Computational Methods for Large-scale Data Mining
-This git repo is based on **Dr. Hua Zhou**'s Biostat 257 at UCLA. See the [course website](https://ucla-biostat-257-2021spring.github.io/schedule/schedule.html) for further reference.
+This git repo is based on **Dr. Hua Zhou**'s Biostat 257 at UCLA. See the [course website](https://ucla-biostat-257-2021spring.github.io/schedule/schedule.html) for further reference. A similar course is taught by **Dr. Vandenberghe** ([ECE 236B](http://www.seas.ucla.edu/~vandenbe/)) at UCLA.
 
 Projects include:
 
