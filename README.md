@@ -3,4 +3,7 @@ This git repo is based on **Dr. Hua Zhou**'s Biostat 257 at UCLA. See the [cours
 
 Topics include:
 
-- hi
+- Part one: algorithms
+
+  1. Computer arithmetic and elements of Jupyter Notebook.
+  2. Introduction to Julia language.
