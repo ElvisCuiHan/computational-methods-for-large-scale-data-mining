@@ -15866,6 +15866,51 @@ lmm.L * transpose(lmm.L) = [2.072478822484914 0.11131049762675521 0.068221434228
 
 </div>
 </div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<table>
+<thead><tr>
+<th>Items</th>
+<th>EM algorithm</th>
+<th>Newton-type algorithms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>stability</td>
+<td>Monotonicity (always increasing)</td>
+<td>Not guaranteed to be increasing</td>
+</tr>
+<tr>
+<td>Convergence rate</td>
+<td>Linear (associated with the eigenvalues of Fisher information matrix)</td>
+<td>Fast (e.g., second order for Newton-Raphson)</td>
+</tr>
+<tr>
+<td>Final objective value</td>
+<td>-2.83426e6</td>
+<td>-2.83426e6</td>
+</tr>
+<tr>
+<td>Total run time</td>
+<td>524.102 ms</td>
+<td>84.246 ms</td>
+</tr>
+<tr>
+<td>Derivation</td>
+<td>CRAZY and PAINFUL!</td>
+<td>Matured technology (according to Dr. Zhou and Dr. Vandenberghe)</td>
+</tr>
+<tr>
+<td>Implementation efforts</td>
+<td>Easy (just a few lines)</td>
+<td>Extremelly <em>PAINFUL</em> to get gradients and Hessian</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
 </body>
 
 
