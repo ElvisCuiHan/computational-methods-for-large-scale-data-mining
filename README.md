@@ -30,3 +30,10 @@ Topics include:
   11. Algorithms for solving spectral decomposition (SDT) and singular value decomposition (SVD).
 
 - Part two: **Optimization**
+  1. Optimization in Julia.
+  2. Non-linear programming: Newton-Raphson, Fisher scoring, Gauss-Newtion, Quasi-Newtion, etc.
+  3. Karush-Kuhn-Tucker (**KKT**) condition for constrained optimization.
+  4. EM algorithm and its variations: ECM, ECME, SEM, Bayesian EM, etc.
+  5. Maximization-Minorization (MM) algorithm (a **UCLA** invention).
+  6. Convex programming I: Linear programming (LP), Quadratic programming (QP).
+  7. Convex programming II: Second order cone programming (SOCP), Semi-definite programming (SDP), Geometric programming (GP).
